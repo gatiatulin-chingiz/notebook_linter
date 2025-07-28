@@ -25,8 +25,8 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
         str: Обработанная тетрадка в формате Markdown
     """
     
-    def load_notebook(file_path: str) -> Dict[str, Any]:
-        """Загрузка Jupyter Notebook из JSON файла"""
+    def load_notebook_from_file(file_path: str) -> Dict[str, Any]:
+        """Загрузка Jupyter Notebook из .ipynb файла"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 notebook = json.load(f)
@@ -158,7 +158,7 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
     
     # Основная логика обработки
     print(f"Загружаю тетрадку: {file_path}")
-    notebook = load_notebook(file_path)
+    notebook = load_notebook_from_file(file_path)
     
     print("Разбиваю тетрадку на части...")
     chunks = split_notebook_into_chunks(notebook)

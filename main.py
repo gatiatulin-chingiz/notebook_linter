@@ -6,18 +6,19 @@ Jupyter Notebook Linter - CLI интерфейс
 
 import sys
 import os
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Добавляем текущую директорию в путь для импорта
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from notebook_linter_module import init_linter, lint_notebook, display_notebook_info
+from notebook_linter_module import process_notebook
 
 def main():
     """Основная функция CLI интерфейса"""
     print("Jupyter Notebook Linter - CLI")
     print("=" * 40)
     print("Для использования в Jupyter Notebook импортируйте:")
-    print("from notebook_linter_module import *")
+    print("from notebook_linter_module import process_notebook")
     print("\nИли используйте этот CLI интерфейс:")
     
     # Проверяем аргументы командной строки
@@ -34,17 +35,20 @@ def main():
         try:
             print(f"📁 Обрабатываю файл: {input_file}")
             
-            # Инициализация линтера
-            print("🔄 Инициализация линтера...")
-            init_linter()
+            # Загрузка модели и токенизатора
+            print("🔄 Загружаю модель и токенизатор...")
+            model_name = "./Текстовые/Qwen3-0.6B"
             
-            # Анализ структуры
-            print("\n📊 Анализ структуры:")
-            display_notebook_info(input_file)
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype="auto",
+                device_map="auto"
+            )
             
             # Обработка
-            print("\n🔄 Обработка notebook...")
-            improved_content = lint_notebook(input_file, display_result=False)
+            print("🔄 Обработка notebook...")
+            improved_content = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
             output_file = input_file.replace('.ipynb', '_improved.md')
@@ -81,13 +85,20 @@ def main():
         try:
             print(f"\n📁 Обрабатываю файл: {input_file}")
             
-            # Инициализация линтера
-            print("🔄 Инициализация линтера...")
-            init_linter()
+            # Загрузка модели и токенизатора
+            print("🔄 Загружаю модель и токенизатор...")
+            model_name = "./Текстовые/Qwen3-0.6B"
+            
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype="auto",
+                device_map="auto"
+            )
             
             # Обработка
             print("🔄 Обработка notebook...")
-            improved_content = lint_notebook(input_file, display_result=False)
+            improved_content = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
             output_file = input_file.replace('.ipynb', '_improved.md')

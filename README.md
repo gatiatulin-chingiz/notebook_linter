@@ -42,11 +42,11 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
 
 # Обработка
-improved_content = process_notebook(model, tokenizer, "notebook.ipynb")
+improved_notebook = process_notebook(model, tokenizer, "notebook.ipynb")
 
 # Сохранение
-with open("improved_notebook.md", "w", encoding="utf-8") as f:
-    f.write(improved_content)
+with open("improved_notebook.ipynb", "w", encoding="utf-8") as f:
+    json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
 ```
 
 #### Из командной строки:
@@ -64,19 +64,19 @@ process_notebook(
     max_tokens=4000,         # Максимум токенов для одной части
     max_new_tokens=8192,     # Максимум новых токенов для генерации
     temperature=0.7          # Температура для генерации
-) -> str                    # Возвращает обработанную тетрадку в формате Markdown
+) -> Dict[str, Any]         # Возвращает обработанную тетрадку в формате .ipynb (JSON структура)
 ```
 
 ## 💡 Примеры использования
 
 ### Базовая обработка:
 ```python
-improved_content = process_notebook(model, tokenizer, "notebook.ipynb")
+improved_notebook = process_notebook(model, tokenizer, "notebook.ipynb")
 ```
 
 ### Для больших файлов:
 ```python
-improved_content = process_notebook(
+improved_notebook = process_notebook(
     model, tokenizer, "large_notebook.ipynb",
     max_tokens=6000, max_new_tokens=12000
 )
@@ -84,7 +84,7 @@ improved_content = process_notebook(
 
 ### Для более креативных результатов:
 ```python
-improved_content = process_notebook(
+improved_notebook = process_notebook(
     model, tokenizer, "notebook.ipynb",
     temperature=0.8
 )
@@ -130,7 +130,7 @@ print(df.head())
 ## 📄 Форматы
 
 - **Вход**: `.ipynb` (Jupyter Notebook JSON)
-- **Выход**: `.md` (Markdown)
+- **Выход**: `.ipynb` (Jupyter Notebook JSON)
 
 ## 🎯 Особенности
 

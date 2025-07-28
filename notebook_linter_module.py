@@ -9,7 +9,7 @@ from typing import Dict, Any, List
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000, 
-                    max_new_tokens: int = 8192, temperature: float = 0.7) -> str:
+                    max_new_tokens: int = 8192, temperature: float = 0.7) -> Dict[str, Any]:
     """
     Обработка Jupyter Notebook файла
     
@@ -22,7 +22,7 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
         temperature: Температура для генерации
     
     Returns:
-        str: Обработанная тетрадка в формате Markdown
+        Dict[str, Any]: Обработанная тетрадка в формате .ipynb (JSON структура)
     """
     
     def load_notebook_from_file(file_path: str) -> Dict[str, Any]:
@@ -118,11 +118,10 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
         """Генерация улучшенной версии части тетрадки"""
         prompt = f"""Ты - эксперт по структурированию Jupyter Notebook. Проанализируй данную часть тетрадки и улучши её:
 
-1. Добавь понятные заголовки для разделов
+1. Структурируй содержимое тетрадки логически (создай разделы)
 2. Обрами код подробными комментариями
-3. На основе outputs напиши выводы и объяснения
-4. Структурируй содержимое логически
-5. Сделай тетрадку более читаемой и понятной
+3. Опиши действия, которые выполняются по ходу тетрадки
+4. Сделай тетрадку более читаемой и понятной
 
 Часть тетрадки:
 {chunk}
@@ -156,12 +155,37 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
         content = tokenizer.decode(output_ids[index:], skip_special_tokens=True).strip("\n")
         return content
     
+    def create_improved_notebook_structure(original_notebook: Dict[str, Any], improved_content: str) -> Dict[str, Any]:
+        """Создание структуры улучшенной тетрадки в формате .ipynb"""
+        # Создаем новую структуру тетрадки
+        improved_notebook = {
+            "cells": [],
+            "metadata": original_notebook.get("metadata", {}),
+            "nbformat": original_notebook.get("nbformat", 4),
+            "nbformat_minor": original_notebook.get("nbformat_minor", 4)
+        }
+        
+        # Разбиваем улучшенный контент на ячейки
+        sections = improved_content.split("\n\n" + "="*80 + "\n\n")
+        
+        for section in sections:
+            if section.strip():
+                # Создаем markdown ячейку для каждого раздела
+                cell = {
+                    "cell_type": "markdown",
+                    "metadata": {},
+                    "source": [section.strip()]
+                }
+                improved_notebook["cells"].append(cell)
+        
+        return improved_notebook
+    
     # Основная логика обработки
     print(f"Загружаю тетрадку: {file_path}")
-    notebook = load_notebook_from_file(file_path)
+    original_notebook = load_notebook_from_file(file_path)
     
     print("Разбиваю тетрадку на части...")
-    chunks = split_notebook_into_chunks(notebook)
+    chunks = split_notebook_into_chunks(original_notebook)
     
     print(f"Тетрадка разбита на {len(chunks)} частей")
     
@@ -172,6 +196,9 @@ def process_notebook(model, tokenizer, file_path: str, max_tokens: int = 4000,
         improved_parts.append(improved_chunk)
     
     # Объединяем все улучшенные части
-    final_notebook = "\n\n" + "="*80 + "\n\n".join(improved_parts)
+    final_content = "\n\n" + "="*80 + "\n\n".join(improved_parts)
     
-    return final_notebook 
+    # Создаем структуру улучшенной тетрадки в формате .ipynb
+    improved_notebook = create_improved_notebook_structure(original_notebook, final_content)
+    
+    return improved_notebook 

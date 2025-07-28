@@ -6,6 +6,7 @@ Jupyter Notebook Linter - CLI интерфейс
 
 import sys
 import os
+import json
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Добавляем текущую директорию в путь для импорта
@@ -48,12 +49,12 @@ def main():
             
             # Обработка
             print("🔄 Обработка notebook...")
-            improved_content = process_notebook(model, tokenizer, input_file)
+            improved_notebook = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
-            output_file = input_file.replace('.ipynb', '_improved.md')
+            output_file = input_file.replace('.ipynb', '_improved.ipynb')
             with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(improved_content)
+                json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
             
             print(f"\n✅ Результат сохранен в: {output_file}")
             
@@ -62,6 +63,7 @@ def main():
             output_size = os.path.getsize(output_file)
             print(f"📊 Размер входного файла: {input_size / 1024:.1f} KB")
             print(f"📊 Размер выходного файла: {output_size / 1024:.1f} KB")
+            print(f"📄 Количество ячеек в улучшенной тетрадке: {len(improved_notebook['cells'])}")
             
         except Exception as e:
             print(f"❌ Ошибка: {str(e)}")
@@ -98,14 +100,15 @@ def main():
             
             # Обработка
             print("🔄 Обработка notebook...")
-            improved_content = process_notebook(model, tokenizer, input_file)
+            improved_notebook = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
-            output_file = input_file.replace('.ipynb', '_improved.md')
+            output_file = input_file.replace('.ipynb', '_improved.ipynb')
             with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(improved_content)
+                json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
             
             print(f"\n✅ Результат сохранен в: {output_file}")
+            print(f"📄 Количество ячеек в улучшенной тетрадке: {len(improved_notebook['cells'])}")
             
         except Exception as e:
             print(f"❌ Ошибка: {str(e)}")

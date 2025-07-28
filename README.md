@@ -45,7 +45,7 @@ model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", dev
 improved_notebook = process_notebook(model, tokenizer, "notebook.ipynb")
 
 # Сохранение
-with open("improved_notebook.ipynb", "w", encoding="utf-8") as f:
+with open("improved_notebook.json", "w", encoding="utf-8") as f:
     json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
 ```
 
@@ -64,7 +64,7 @@ process_notebook(
     max_tokens=4000,         # Максимум токенов для одной части
     max_new_tokens=8192,     # Максимум новых токенов для генерации
     temperature=0.7          # Температура для генерации
-) -> Dict[str, Any]         # Возвращает обработанную тетрадку в формате .ipynb (JSON структура)
+) -> Dict[str, Any]         # Возвращает обработанную тетрадку в формате JSON
 ```
 
 ## 💡 Примеры использования
@@ -130,7 +130,7 @@ print(df.head())
 ## 📄 Форматы
 
 - **Вход**: `.ipynb` (Jupyter Notebook JSON)
-- **Выход**: `.ipynb` (Jupyter Notebook JSON)
+- **Выход**: `.json` (JSON структура)
 
 ## 🎯 Особенности
 

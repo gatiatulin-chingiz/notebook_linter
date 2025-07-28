@@ -52,7 +52,7 @@ def main():
             improved_notebook = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
-            output_file = input_file.replace('.ipynb', '_improved.ipynb')
+            output_file = input_file.replace('.ipynb', '_improved.json')
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
             
@@ -103,7 +103,7 @@ def main():
             improved_notebook = process_notebook(model, tokenizer, input_file)
             
             # Сохранение результата
-            output_file = input_file.replace('.ipynb', '_improved.ipynb')
+            output_file = input_file.replace('.ipynb', '_improved.json')
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(improved_notebook, f, indent=2, ensure_ascii=False)
             
